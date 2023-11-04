@@ -14,14 +14,15 @@ RED = 4
 WHITE = 5
 BROWN = 6
 
-black_hsv = [0, 360, 0, 100, 0, 30]
-white_hsv = [0, 360, 0, 35, black_hsv[5] + 1, 100]
-brown_hsv = [0, 10, 0, 10, 0, 10]
-red_hsv_2 = [300, 360]
-blue_hsv = [180, red_hsv_2[0] - 1, white_hsv[3] + 1, 100, black_hsv[5] + 1, 100]
-green_hsv = [90, blue_hsv[0] - 1, white_hsv[3] + 1, 100, black_hsv[5] + 1, 100]
-yellow_hsv = [30, green_hsv[0] - 1, white_hsv[3] + 1, 100, black_hsv[5] + 1, 100]
-red_hsv = [0, yellow_hsv[0] - 1, white_hsv[3] + 1, 100, black_hsv[5] + 1, 100]
+V_MIN = 30
+S_MIN = 35
+
+red_h = [300, 360]
+blue_h = [180, red_h[0] - 1]
+green_h = [90, blue_h[0] - 1]
+yellow_h = [30, green_h[0] - 1]
+red_h_2 = [0, yellow_h[0] - 1]
+# brown_hsv = [20, 1.5 * yellow_h[0], 60, 66, 45, 55]
 
 ev3 = EV3Brick()
 speed = 100
@@ -63,69 +64,41 @@ def conv_rgb2hsv(rgb):
 def detect_color():
 	rgb = color_sensor.rgb()
 	hsv = conv_rgb2hsv(rgb)
-
-	if (black[0] <= hsv[0] and black[1] >= hsv[0])
-							and (black[2] <= hsv[1] and black[3] >= hsv[1])
-												and (black[4] <= hsv[2] and black[5] >= hsv[2]):
+	if hsv[2] < V_MIN:
 		return BLACK
+	if hsv[1] < S_MIN:
+		return WHITE
+	if hsv[0] >= blue_h[0] and hsv[0] <= blue_h[1]:
+		return BLUE
+	if hsv[0] >= green_h[0] and hsv[0] <= green_h[1]:
+		return GREEN
+	if hsv[0] >= yellow_h[0] and hsv[0] <= yellow_h[1]:
+		# pass # либо желтый, либо коричневый
+		return YELLOW
+	if hsv[0] >= red_h[0] and hsv[0] <= red_h[1] or hsv[0] >= red_h_2[0] and hsv[0] <= red_h_2[1]:
+		# pass # либо красный, либо коричневый
+		return RED
+	return -1
 
-# i = 0
-# ev3.speaker.beep()
-# while i < 7:
-# 	run_motor(motor_b, angle_b)
-# 	run_motor(motor_c, angle_c)
-# 	run_motor(motor_b, 0)
-	
-# 	ev3.screen.print(detect_color())
-
-# 	run_motor(motor_b, angle_b)
-# 	run_motor(motor_c, 0)
-# 	run_motor(motor_b, 0)
-# 	ev3.speaker.beep()
-# 	wait(5000)
-
-# 	i += 1
-
-# i = 0
-# while i < 3:
-# 	ev3.speaker.beep()
-# 	wait(500)
-# 	i += 1
-
-
-
-
-
-
-
-
-# run_motor(motor_b, angle)
-# run_motor(motor_c, angle)
-# run_motor(motor_b, 10)
-
-print(Color.RED)
-print(type(Color.RED))
-rgb = color_sensor.rgb()
-print(rgb)
-print(type(rgb))
-
-possible_colors = [Color.RED, Color.GREEN, Color.BLUE, Color.YELLOW]
 i = 0
 ev3.speaker.beep()
-while True:
-	color = color_sensor.color()
-	ambient = color_sensor.ambient()
-	reflection = color_sensor.reflection()
-	rgb = color_sensor.rgb()
-	ev3.screen.print(color)
-	ev3.screen.print(ambient)
-	ev3.screen.print(reflection)
-	ev3.screen.print(rgb)
-	ev3.screen.print(i)
+while i < 7:
+	run_motor(motor_b, angle_b)
+	run_motor(motor_c, angle_c)
+	run_motor(motor_b, 0)
+	
+	ev3.screen.print(detect_color())
+
+	run_motor(motor_b, angle_b)
+	run_motor(motor_c, 0)
+	run_motor(motor_b, 0)
+	ev3.speaker.beep()
+	wait(5000)
+
 	i += 1
-	wait(1000)
-	# if color in possible_colors:
-	# 	ev3.screen.print(color)
-	# 	ev3.screen.print(i)
-	# 	i += 1
-	# 	wait(2000)
+
+i = 0
+while i < 3:
+	ev3.speaker.beep()
+	wait(500)
+	i += 1
