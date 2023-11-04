@@ -14,13 +14,14 @@ RED = 4
 WHITE = 5
 BROWN = 6
 
-black_hsv = [0, 10, 0, 10, 0, 10]
-blue_hsv = [0, 10, 0, 10, 0, 10]
-green_hsv = [0, 10, 0, 10, 0, 10]
-yellow_hsv = [0, 10, 0, 10, 0, 10]
-red_hsv = [0, 10, 0, 10, 0, 10]
-white_hsv = [0, 10, 0, 10, 0, 10]
+black_hsv = [0, 360, 0, 100, 0, 30]
+white_hsv = [0, 360, 0, 35, black_hsv[5] + 1, 100]
 brown_hsv = [0, 10, 0, 10, 0, 10]
+red_hsv_2 = [300, 360]
+blue_hsv = [180, red_hsv_2[0] - 1, white_hsv[3] + 1, 100, black_hsv[5] + 1, 100]
+green_hsv = [90, blue_hsv[0] - 1, white_hsv[3] + 1, 100, black_hsv[5] + 1, 100]
+yellow_hsv = [30, green_hsv[0] - 1, white_hsv[3] + 1, 100, black_hsv[5] + 1, 100]
+red_hsv = [0, yellow_hsv[0] - 1, white_hsv[3] + 1, 100, black_hsv[5] + 1, 100]
 
 ev3 = EV3Brick()
 speed = 100
@@ -35,12 +36,34 @@ def run_motor(motor, angle):
 	wait(500)
 
 def conv_rgb2hsv(rgb):
-	pass
-	return
+	r = rgb[0] / 100
+	g = rgb[1] / 100
+	b = rgb[2] / 100
+	cmax = max(r, g, b)
+	cmin = min(r, g, b)
+	delta = cmax - cmin
+	# ------------------------ H
+	if delta == 0:
+		h = 0
+	elif cmax == r:
+		h = 60 * ((g - b) / delta % 6)
+	elif cmax == g:
+		h = 60 * ((b - r) / delta + 2)
+	else:
+		h = 60 * ((r - g) / delta + 4)
+	# ------------------------ S
+	if cmax == 0:
+		s = 0
+	else:
+		s = delta / cmax
+	# ------------------------ V
+	v = cmax
+	return [int(round(h)), int(round(100 * s)), int(round(100 * v))]
 
 def detect_color():
 	rgb = color_sensor.rgb()
 	hsv = conv_rgb2hsv(rgb)
+
 	if (black[0] <= hsv[0] and black[1] >= hsv[0])
 							and (black[2] <= hsv[1] and black[3] >= hsv[1])
 												and (black[4] <= hsv[2] and black[5] >= hsv[2]):
