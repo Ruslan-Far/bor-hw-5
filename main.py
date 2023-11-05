@@ -14,19 +14,19 @@ RED = 4
 WHITE = 5
 BROWN = 6
 
-V_MIN = 30
-S_MIN = 35
+V_MIN = 3
+S_MIN = 50
 
 red_h = [300, 360]
 blue_h = [180, red_h[0] - 1]
 green_h = [90, blue_h[0] - 1]
-yellow_h = [30, green_h[0] - 1]
+yellow_h = [25, green_h[0] - 1]
 red_h_2 = [0, yellow_h[0] - 1]
 # brown_hsv = [20, 1.5 * yellow_h[0], 60, 66, 45, 55]
 
 ev3 = EV3Brick()
 speed = 100
-angle_b = 60
+angle_b = 70
 angle_c = 90
 motor_b = Motor(Port.B, Direction.COUNTERCLOCKWISE, [8, 30])
 motor_c = Motor(Port.C, Direction.COUNTERCLOCKWISE, [12, 39])
@@ -64,6 +64,7 @@ def conv_rgb2hsv(rgb):
 def detect_color():
 	rgb = color_sensor.rgb()
 	hsv = conv_rgb2hsv(rgb)
+	ev3.screen.print(hsv)
 	if hsv[2] < V_MIN:
 		return BLACK
 	if hsv[1] < S_MIN:
@@ -81,24 +82,64 @@ def detect_color():
 	return -1
 
 i = 0
-ev3.speaker.beep()
-while i < 7:
+repeats = 2
+ev3.speaker.beep(1000, 700)
+while i < repeats:
 	run_motor(motor_b, angle_b)
 	run_motor(motor_c, angle_c)
 	run_motor(motor_b, 0)
 	
+	wait(1000)
+	ev3.screen.clear()
 	ev3.screen.print(detect_color())
 
 	run_motor(motor_b, angle_b)
 	run_motor(motor_c, 0)
 	run_motor(motor_b, 0)
-	ev3.speaker.beep()
-	wait(5000)
+
+	if i + 1 != repeats:
+		ev3.speaker.beep(600, 300)
+		wait(5000)
 
 	i += 1
 
 i = 0
 while i < 3:
-	ev3.speaker.beep()
+	ev3.speaker.beep(300, 100)
 	wait(500)
 	i += 1
+
+
+
+
+# run_motor(motor_b, -70)
+# run_motor(motor_b, 0)
+# run_motor(motor_c, -90)
+
+# run_motor(motor_b, angle_b)
+# run_motor(motor_c, angle_c)
+# run_motor(motor_b, 0)
+# wait(10000)
+# run_motor(motor_b, angle_b)
+# run_motor(motor_c, -angle_c)
+# run_motor(motor_b, 0)
+
+
+
+# possible_colors = [Color.RED, Color.GREEN, Color.BLUE, Color.YELLOW]
+# i = 0
+# ev3.speaker.beep()
+# while True:
+# 	color = color_sensor.color()
+# 	# ambient = color_sensor.ambient()
+# 	# reflection = color_sensor.reflection()
+# 	rgb = color_sensor.rgb()
+# 	ev3.screen.print(color)
+# 	# ev3.screen.print(ambient)
+# 	# ev3.screen.print(reflection)
+# 	ev3.screen.print(rgb)
+# 	ev3.screen.print(detect_color())
+# 	ev3.screen.print(i)
+# 	i += 1
+# 	wait(1000)
+# 	ev3.screen.clear()
