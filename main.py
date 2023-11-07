@@ -15,18 +15,18 @@ WHITE = 5
 BROWN = 6
 
 V_MIN = 3
+V_MIN_BROWN = 8
 S_MIN = 50
 
 red_h = [300, 360]
 blue_h = [180, red_h[0] - 1]
-green_h = [90, blue_h[0] - 1]
+green_h = [65, blue_h[0] - 1]
 yellow_h = [25, green_h[0] - 1]
 red_h_2 = [0, yellow_h[0] - 1]
-# brown_hsv = [20, 1.5 * yellow_h[0], 60, 66, 45, 55]
 
 ev3 = EV3Brick()
 speed = 100
-angle_b = 70
+angle_b = 80
 angle_c = 90
 motor_b = Motor(Port.B, Direction.COUNTERCLOCKWISE, [8, 30])
 motor_c = Motor(Port.C, Direction.COUNTERCLOCKWISE, [12, 39])
@@ -34,6 +34,7 @@ color_sensor = ColorSensor(Port.S3)
 
 def run_motor(motor, angle):
 	motor.run_target(speed, angle)
+	motor.reset_angle(0)
 	wait(500)
 
 def conv_rgb2hsv(rgb):
@@ -74,28 +75,32 @@ def detect_color():
 	if hsv[0] >= green_h[0] and hsv[0] <= green_h[1]:
 		return GREEN
 	if hsv[0] >= yellow_h[0] and hsv[0] <= yellow_h[1]:
-		# pass # либо желтый, либо коричневый
+		if hsv[2] < V_MIN_BROWN:
+			return BROWN
 		return YELLOW
-	if hsv[0] >= red_h[0] and hsv[0] <= red_h[1] or hsv[0] >= red_h_2[0] and hsv[0] <= red_h_2[1]:
-		# pass # либо красный, либо коричневый
+	if hsv[0] >= red_h[0] and hsv[0] <= red_h[1]:
+		return RED
+	if hsv[0] >= red_h_2[0] and hsv[0] <= red_h_2[1]:
+		if hsv[2] < V_MIN_BROWN:
+			return BROWN
 		return RED
 	return -1
 
 i = 0
-repeats = 2
+repeats = 7
 ev3.speaker.beep(1000, 700)
 while i < repeats:
 	run_motor(motor_b, angle_b)
 	run_motor(motor_c, angle_c)
-	run_motor(motor_b, 0)
+	run_motor(motor_b, -(angle_b + 3))
 	
 	wait(1000)
 	ev3.screen.clear()
 	ev3.screen.print(detect_color())
 
-	run_motor(motor_b, angle_b)
-	run_motor(motor_c, 0)
-	run_motor(motor_b, 0)
+	run_motor(motor_b, angle_b + 3)
+	run_motor(motor_c, -angle_c)
+	run_motor(motor_b, -angle_b)
 
 	if i + 1 != repeats:
 		ev3.speaker.beep(600, 300)
@@ -112,12 +117,13 @@ while i < 3:
 
 
 
-# run_motor(motor_b, -70)
+# run_motor(motor_b, 3)
 # run_motor(motor_b, 0)
 # run_motor(motor_c, -90)
 
 # run_motor(motor_b, angle_b)
-# run_motor(motor_c, angle_c)
+# run_motor(motor_c, -angle_c)
+# run_motor(motor_b, -angle_b)
 # run_motor(motor_b, 0)
 # wait(10000)
 # run_motor(motor_b, angle_b)
@@ -133,11 +139,11 @@ while i < 3:
 # 	color = color_sensor.color()
 # 	# ambient = color_sensor.ambient()
 # 	# reflection = color_sensor.reflection()
-# 	rgb = color_sensor.rgb()
-# 	ev3.screen.print(color)
+# 	# rgb = color_sensor.rgb()
+# 	# ev3.screen.print(color)
 # 	# ev3.screen.print(ambient)
 # 	# ev3.screen.print(reflection)
-# 	ev3.screen.print(rgb)
+# 	# ev3.screen.print(rgb)
 # 	ev3.screen.print(detect_color())
 # 	ev3.screen.print(i)
 # 	i += 1
